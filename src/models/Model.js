@@ -18,9 +18,8 @@ class Model {
 
     async delete(pk) {
 
-        let query = "DELETE FROM " + this.table + " WHERE " + this._buildPKQuery(pk)
-        let [rows] = await this.db.query(query)
-        return rows
+        let query = "DELETE FROM " + this.table + " WHERE " + this._buildPKQuery(pk) + " RETURNING *"
+        return this._executeQuery(query)
 
     }
 
@@ -60,10 +59,12 @@ class Model {
             cases[i] = cases[i].txts.map(txt => this._buildCaseQuery(txt, cases[i].field, 1))
         }
 
-        cases = cases.flat().join('+')
+        cases = cases.flat().unshift("CASE WHEN 1=1 THEN 1 ELSE 0")
+        cases = cases.join('+')
 
         //   Merging together
 
+        // let query = `SELECT *,(${cases}) as relevance FROM ${this.table} HAVING relevance > ${+!cases.length}`
 
 
 
@@ -72,8 +73,7 @@ class Model {
 
     async get(pk) {
         let query = "SELECT * FROM " + this.table + " WHERE " + this._buildPKQuery(pk)
-        let [rows] = await this.db.query(query)
-        return rows
+        return this._executeQuery(query)
     }
 
     _buildPKQuery(pk) {
@@ -82,5 +82,15 @@ class Model {
 
     _buildCaseQuery(txt, field, relevance = 1) {
         return "CASE WHEN " + field + " ILIKE '%" + txt + "%' THEN " + relevance + " ELSE 0 END"
+    }
+
+    async _executeQuery(query, params = []){
+        try {
+            const [rows] = await this.db.query(query, params);
+            return rows;
+        } catch (error) {
+            console.error("Database query error:", error);
+            throw new Error("Error executing database query");
+        }
     }
 }
