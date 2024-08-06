@@ -1,5 +1,5 @@
-import anner from "../utils/anner.arrays";
-import db from "../database/db";
+import anner from "../utils/anner.arrays.js";
+import db from "../database/db.js";
 
 class Model {
     constructor(table = "", pageSize = 15) {
@@ -8,7 +8,17 @@ class Model {
         this.db = db
     }
 
-    create(data) {
+    async create(data = {}) {
+        let cols = Object.keys(data)
+        let placeholders = new Array(cols.length).fill('?')
+        
+        let query = `INSERT INTO ${this.table} (${cols.join(',')}) VALUES (${placeholders.join(',')})`
+        return await this._executeQuery(query,Object.values(data))
+
+        
+    }
+
+    async createBundle(){
 
     }
 
@@ -18,12 +28,12 @@ class Model {
 
     async delete(pk) {
 
-        let query = "DELETE FROM " + this.table + " WHERE " + this._buildPKQuery(pk) + " RETURNING *"
-        return this._executeQuery(query)
+        let query = "DELETE FROM " + this.table + " WHERE " + this._buildPKQuery(pk)
+        return await this._executeQuery(query)
 
     }
 
-    async search(params) { // [{q:"Salame",field:"nombre",exclusive:false}]
+    async search(params = []) { // [{txt:"Salame",field:"nombre",exclusive:false}]
         // Exclusives handling
         let exclusives = params.filter(obj => obj.exclusive)
         let exclusivesObj = {}
@@ -59,12 +69,14 @@ class Model {
             cases[i] = cases[i].txts.map(txt => this._buildCaseQuery(txt, cases[i].field, 1))
         }
 
-        cases = cases.flat().unshift("CASE WHEN 1=1 THEN 1 ELSE 0")
-        cases = cases.join('+')
-
+        cases = cases.flat()
+        cases.unshift("CASE WHEN 1=1 THEN 1 ELSE 0 END")
+                
         //   Merging together
 
-        // let query = `SELECT *,(${cases}) as relevance FROM ${this.table} HAVING relevance > ${+!cases.length}`
+        let query = `SELECT * FROM ( SELECT *, (${cases.join('+')}) AS relevance FROM ${this.table} ${exclusives}) subquery WHERE relevance > ${+!(cases.length == 1)} ORDER BY relevance DESC`
+
+        return await this._executeQuery(query)
 
 
 
@@ -73,7 +85,7 @@ class Model {
 
     async get(pk) {
         let query = "SELECT * FROM " + this.table + " WHERE " + this._buildPKQuery(pk)
-        return this._executeQuery(query)
+        return await this._executeQuery(query)
     }
 
     _buildPKQuery(pk) {
@@ -81,10 +93,10 @@ class Model {
     }
 
     _buildCaseQuery(txt, field, relevance = 1) {
-        return "CASE WHEN " + field + " ILIKE '%" + txt + "%' THEN " + relevance + " ELSE 0 END"
+        return "CASE WHEN LOWER(" + field + ") LIKE LOWER('%" + txt + "%') THEN " + relevance + " ELSE 0 END"
     }
 
-    async _executeQuery(query, params = []){
+    async _executeQuery(query, params = []) {
         try {
             const [rows] = await this.db.query(query, params);
             return rows;
@@ -94,3 +106,5 @@ class Model {
         }
     }
 }
+
+export default Model
