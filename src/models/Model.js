@@ -8,6 +8,7 @@ class Model {
         this.db = db
     }
 
+    
     async create(data = {}) {
         let cols = Object.keys(data)
         let placeholders = new Array(cols.length).fill('?')
@@ -18,7 +19,16 @@ class Model {
         
     }
 
-    async createBundle(){
+    async createBundle(arr = [{}]){
+        let fields = Object.keys(arr[0])
+        let query = "INSERT INTO "+this.table+ `(${fields.join(',')}) VALUES `
+        let placeholders = arr.map(_ => `(${new Array(fields.length).fill('?').join(',')})`).join(', ')
+        query += placeholders
+        let values = arr.map(obj => Object.values(obj)).flat()
+
+        return await this._executeQuery(query, values)
+
+
 
     }
 
@@ -96,9 +106,9 @@ class Model {
         return "CASE WHEN LOWER(" + field + ") LIKE LOWER('%" + txt + "%') THEN " + relevance + " ELSE 0 END"
     }
 
-    async _executeQuery(query, params = []) {
+    async _executeQuery(query, values = []) {
         try {
-            const [rows] = await this.db.query(query, params);
+            const [rows] = await this.db.query(query, values);
             return rows;
         } catch (error) {
             console.error("Database query error:", error);

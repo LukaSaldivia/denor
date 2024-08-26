@@ -11,4 +11,5 @@ anner.getAccumulated = function (txt) {
   return acc
 }
 
+
 export default anner
