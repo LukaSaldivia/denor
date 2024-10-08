@@ -1,5 +1,6 @@
 import anner from "../utils/anner.arrays.js";
 import db from "../database/db.js";
+import Filter from "../vendor/Filter/Filter.js";
 
 class Model {
     constructor(table = "", pageSize = 15) {
@@ -32,7 +33,13 @@ class Model {
 
     }
 
-    edit(data, pk) {
+    async edit(data, pk) {
+
+    let updates = Object.keys(data).map(col => `${col} = ?`).join(", ");
+
+    let query = `UPDATE ${this.table} SET ${updates} WHERE ${this._buildPKQuery(pk)}`;
+
+    return await this._executeQuery(query, Object.values(data));
 
     }
 
@@ -43,53 +50,34 @@ class Model {
 
     }
 
-    async search(params = []) { // [{txt:"Salame",field:"nombre",exclusive:false}]
+    async search(params = [Filter]) {
+        
+
+        let filters = anner.groupBy(params, (filter => filter.exclusive))
+
         // Exclusives handling
-        let exclusives = params.filter(obj => obj.exclusive)
-        let exclusivesObj = {}
+        let exclusives = filters[true] || []
 
-        for (const obj of exclusives) {
-            exclusivesObj[obj.field] = obj.txt
-        }
+        let exclusivesQuery = exclusives.map(filter => filter.get()).join(' AND ')
 
-        exclusives = this._buildPKQuery(exclusivesObj)
-
-
-
-        if (exclusives) {
-            exclusives = "WHERE " + exclusives
+        if (exclusivesQuery) {
+            exclusivesQuery = "WHERE " + exclusivesQuery
         }
 
         //   Non exclusives handling
 
-        let notExclusives = params.filter(obj => !obj.exclusive)
+        let nonExclusives = filters[false] || []
 
+        let nonExclusivesQuery = nonExclusives.map(filter => filter.get())
+        nonExclusivesQuery.unshift("CASE WHEN 1=1 THEN 1 ELSE 0 END")
+        nonExclusivesQuery = nonExclusivesQuery.join('+')
 
-        let cases = []
-
-        for (const obj of notExclusives) {
-            cases.push({
-                field: obj.field,
-                txts: anner.getAccumulated(obj.txt)
-            })
-        }
-
-        for (let i = 0; i < cases.length; i++) {
-
-            cases[i] = cases[i].txts.map(txt => this._buildCaseQuery(txt, cases[i].field, 1))
-        }
-
-        cases = cases.flat()
-        cases.unshift("CASE WHEN 1=1 THEN 1 ELSE 0 END")
                 
         //   Merging together
 
-        let query = `SELECT * FROM ( SELECT *, (${cases.join('+')}) AS relevance FROM ${this.table} ${exclusives}) subquery WHERE relevance > ${+!(cases.length == 1)} ORDER BY relevance DESC`
+        let query = `SELECT * FROM ( SELECT *, (${nonExclusivesQuery}) AS relevance FROM ${this.table} ${exclusivesQuery}) subquery WHERE relevance > ${+(nonExclusives.length == 1)} ORDER BY relevance DESC`
 
         return await this._executeQuery(query)
-
-
-
 
     }
 
@@ -102,9 +90,6 @@ class Model {
         return Object.entries(pk).map(arr => `${arr[0]} = '${arr[1]}'`).join(" AND ")
     }
 
-    _buildCaseQuery(txt, field, relevance = 1) {
-        return "CASE WHEN LOWER(" + field + ") LIKE LOWER('%" + txt + "%') THEN " + relevance + " ELSE 0 END"
-    }
 
     async _executeQuery(query, values = []) {
         try {
