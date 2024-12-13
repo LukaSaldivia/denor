@@ -1,7 +1,7 @@
-let anner = {}
 
-anner.getAccumulated = function (txt = "") {
-  let acc = []
+
+function getAccumulated(txt : string) : string[] {
+  let acc : string[] = []
   let spl = txt.split('')
   
   for(let i = 0; i< spl.length ; i++){
@@ -11,7 +11,7 @@ anner.getAccumulated = function (txt = "") {
   return acc
 }
 
-anner.groupBy = function(arr = [], fn){
+function groupBy<T>(arr : T[], fn : Function) : { any : T[]} | {} {
   let grouped = {}
   for(let item of arr){
     grouped[fn(item)] = [...(grouped[fn(item)] || []), item]
@@ -21,4 +21,4 @@ anner.groupBy = function(arr = [], fn){
 }
 
 
-export default anner
+export { getAccumulated, groupBy }
