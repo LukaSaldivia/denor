@@ -3,8 +3,8 @@ import Filter from "./Filter.js";
 export default class DateFilter<C extends string> extends Filter<C> {
   date: string;
 
-  constructor(date: string, field: C) {
-    super(field);
+  constructor(date: string, field: C, score? : number) {
+    super(field, score);
     this.date = date;
   }
 

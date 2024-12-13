@@ -3,8 +3,8 @@ import Filter from "./Filter.ts";
 
 export default class TextFilter<C extends string> extends Filter<C>{
   txt = ''
-  constructor(txt = "", field : C){
-    super(field)
+  constructor(txt = "", field : C, score? : number){
+    super(field, score)
     this.txt = txt
     this.score = this.score / this.txt.length
   }

@@ -11,7 +11,6 @@ let model = new Model(productos_table)
 
 let textF = new TextFilter<typeof productos_table.columns[number]>('arra', "nombre")
 
-console.log(await model.search([textF]))
 
 
 

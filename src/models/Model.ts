@@ -4,6 +4,7 @@ import Filter from "../vendor/Filter/Filter.js";
 import { Table } from "../types/MVC-related-types.js";
 import catchError from "../utils/catchError.js";
 import { ConnectionError } from "../errors/EError.js";
+import SearchQuery from "../vendor/SearchQuery.js";
 
 
 class Model<C extends string, PK extends C[]>{
@@ -11,6 +12,7 @@ class Model<C extends string, PK extends C[]>{
     private table : Table<C, PK>
     table_name = ''
     db : typeof db
+    private search_object : SearchQuery<C>
 
     constructor(table : Table<C, PK>) {
         this.table = table;
@@ -57,18 +59,35 @@ class Model<C extends string, PK extends C[]>{
 
     }
 
-    async search(params : Filter<C>[] = [], min = 0) {
+    // async search(params : Filter<C>[] = [], min = 0) : SearchQuery<C>{
         
-        let cases = params.map((filter : Filter<C>) => filter.get())
+    //     let cases = params.map((filter : Filter<C>) => filter.get())
+    //     if (cases.length == 0) {
+    //         cases.push(String(min))
+    //     }
+    //     let casesQuery = cases.join('+')
+
+    //     let query = `SELECT * FROM ( SELECT *, (${casesQuery}) AS relevance FROM ${this.table_name}) subquery WHERE relevance >= ${min} ORDER BY relevance DESC`
+
+    //     return await this._executeQuery(query)
+
+    // }
+
+    search() : SearchQuery<C>{
+        this.search_object = new SearchQuery<C>()
+        return this.search_object
+    }
+
+    async executeSearch(min = 0){
+        let cases = this.search_object.filters.map((filter : Filter<C>) => filter.get())
         if (cases.length == 0) {
-            cases.push(String(min - 1))
+            cases.push(String(min))
         }
         let casesQuery = cases.join('+')
 
-        let query = `SELECT * FROM ( SELECT *, (${casesQuery}) AS relevance FROM ${this.table_name}) subquery WHERE relevance > ${min} ORDER BY relevance DESC`
+        let query = `SELECT * FROM ( SELECT *, (${casesQuery}) AS relevance FROM ${this.table_name}) subquery WHERE relevance >= ${min} ORDER BY relevance DESC`
 
         return await this._executeQuery(query)
-
     }
 
     async get(pk : Record<PK[number], string>) {

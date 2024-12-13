@@ -2,8 +2,8 @@ import Filter from "./Filter.ts";
 
 export default class NumberFilter<C extends string> extends Filter<C>{
   num = 0
-  constructor(num : number, field : C){
-    super(field)
+  constructor(num : number, field : C, score? : number){
+    super(field, score)
     this.num = num
   }
 

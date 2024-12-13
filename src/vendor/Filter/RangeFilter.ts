@@ -3,8 +3,8 @@ import Filter from "./Filter.ts";
 export default class RangeFilter<C extends string> extends Filter<C>{
   min : string | number
   max : string | number
-  constructor(min : string | number, max : string | number, field : C){
-    super(field)
+  constructor(min : string | number, max : string | number, field : C, score? : number){
+    super(field, score)
     this.min = min
     this.max = max
   }
