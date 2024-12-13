@@ -5,7 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/app.js"
+    "dev:path" : "tsc --noEmit && node --loader ts-node/esm",
+    "dev": "npm run dev:path -- src/app.js",
+    "watch:path": "nodemon --watch src --ext ts,js --exec \"npx tsc --noEmit && node --loader ts-node/esm\"",
+    "watch": "npm run watch:path -- src/app.js"
   },
   "keywords": [],
   "author": "",
@@ -21,9 +24,12 @@
     "mysql2": "^3.11.0"
   },
   "devDependencies": {
-    "@types/node": "^22.9.1",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.1",
+    "@types/node": "^22.10.2",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
   }
 }

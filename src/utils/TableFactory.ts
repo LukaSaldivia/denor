@@ -1,4 +1,4 @@
-import { Table } from "../types/MVC-related-types";
+import { Table } from "../types/MVC-related-types.js";
 
 export default class TableFactory {
   static createTable<C extends string, PK extends C[]>(

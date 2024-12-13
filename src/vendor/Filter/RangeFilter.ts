@@ -1,4 +1,4 @@
-import Filter from "./Filter.ts";
+import Filter from "./Filter.js";
 
 export default class RangeFilter<C extends string> extends Filter<C>{
   min : string | number
@@ -12,7 +12,7 @@ export default class RangeFilter<C extends string> extends Filter<C>{
   get(){
       let cases : string[] = []
       cases.push(this._buildCaseQuery(this.min, this.max))
-      cases.unshift("CASE WHEN 1=1 THEN 1 ELSE 0 END")
+      cases.unshift(this.fallbackCase)
       return cases.join('+')
     
   }

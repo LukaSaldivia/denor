@@ -1,4 +1,4 @@
-import { _Error } from "../errors/EError";
+import { _Error } from "../errors/EError.js";
 
 export default async function catchError<T, _Error>(
   promise : Promise<T>, 

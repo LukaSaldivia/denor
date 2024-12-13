@@ -1,28 +1,23 @@
 import TableFactory from "../utils/TableFactory.js";
 import Model from "./Model.js";
-let usuarios_table = TableFactory.createTable('usuario', ["id", "nombre", "clave", "creado_en"], ["id"])
+let usuarios_table = TableFactory.createTable('usuario', ["id", "nombre", "clave", "creado_el"], ["id"])
 
 let model = new Model(usuarios_table)
 
-
-model.search()
+model.newSearch()
+// .appendFilter({
+//   type : 'date',
+//   field : 'creado_el',
+//   value : '2024-12-12',
+//   score : 0
+// })
 .appendFilter({
-  type : "date",
-  field : "creado_en",
-  value : "2024-7-8",
-  score : 20
-
-})
-.appendFilter({
-  type : "text",
+  type : 'text',
   field : 'nombre',
-  value : 'Luka'
+  value : 'Luka',
+  score : 10
 })
 
-let results = await model.executeSearch(20)
-
-
-
-
+console.log(await model.executeSearch())
 
 export default model

@@ -11,7 +11,7 @@ export default class DateFilter<C extends string> extends Filter<C> {
   get() {
     let cases: string[] = [];
     cases.push(this._buildCaseQuery(this.date));
-    cases.unshift("CASE WHEN 1=1 THEN 1 ELSE 0 END");
+    cases.unshift(this.fallbackCase);
     return cases.join('+');
   }
 

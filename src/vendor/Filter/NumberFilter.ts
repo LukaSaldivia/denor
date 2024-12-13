@@ -1,4 +1,4 @@
-import Filter from "./Filter.ts";
+import Filter from "./Filter.js";
 
 export default class NumberFilter<C extends string> extends Filter<C>{
   num = 0
@@ -10,7 +10,7 @@ export default class NumberFilter<C extends string> extends Filter<C>{
   get(){
       let cases : string[] = []
       cases.push(this._buildCaseQuery(this.num))
-      cases.unshift("CASE WHEN 1=1 THEN 1 ELSE 0 END")
+      cases.unshift(this.fallbackCase)
       return cases.join('+')
     
   }

@@ -7,35 +7,35 @@ class Controller<C extends string, PK extends C[]>{
     this.model = model
   }
 
-  async createBundle(req : { body : object }, res){
-    let {body} = req
-    let bodyArr = Object.entries(body)
+  // async createBundle(req : { body : object }, res){
+  //   let {body} = req
+  //   let bodyArr = Object.entries(body)
 
-    let formated : Record<C, string | number>[] = []
+  //   let formated : Record<C, string | number>[] = []
 
-    let groups = groupBy(bodyArr, (item : string)=>item[0].split('%')[1])
+  //   let groups = groupBy(bodyArr, (item : string)=>item[0].split('%')[1])
 
 
-    for (const key in groups) {
-      let entries = groups[key].map((entry : string) => [entry[0].split('%')[0], entry[1]])
-      groups[key] = entries
+  //   for (const key in groups) {
+  //     let entries = groups[key].map((entry : string) => [entry[0].split('%')[0], entry[1]])
+  //     groups[key] = entries
 
-      let obj : Record<C, string | number> = {}
+  //     let obj : Record<C, string | number> = {}
       
-      for (const entry of groups[key]) {
-        obj[entry[0]] = entry[1]
-      }
-      formated.push(obj)
-    }
+  //     for (const entry of groups[key]) {
+  //       obj[entry[0]] = entry[1]
+  //     }
+  //     formated.push(obj)
+  //   }
 
 
 
-    await this.model.createBundle(formated)
+  //   await this.model.createBundle(formated)
 
 
-    return formated
+  //   return formated
     
-  }
+  // }
 }
 
 export default Controller
