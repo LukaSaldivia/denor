@@ -5,6 +5,7 @@ import RangeFilter from "./Filter/RangeFilter.js";
 import TextFilter from "./Filter/TextFilter.js";
 import DateFilter from "./Filter/DateFilter.js";
 import NumberFilter from "./Filter/NumberFilter.js";
+import StrictTextFilter from "./Filter/StrictTextFilter.js";
 
 
 export default class FilterGroup<C extends string>{
@@ -33,6 +34,12 @@ export default class FilterGroup<C extends string>{
         throw new Error()
       }
       return new NumberFilter<C>(options.value, options.field, options.score)
+    },
+    "stricttext" : (options : FilterOptions<C>) : Filter<C> => {
+      if (options.type != 'stricttext') {
+        throw new Error()
+      }
+      return new StrictTextFilter<C>(options.value, options.field, options.score)
     },
     
   }

@@ -16,7 +16,7 @@ type FilterOptions<C extends string> = {
       type: 'number'
       value: number
     } | {
-      type: 'text' | 'date'
+      type: 'text' | 'date' | 'stricttext'
       value: string
     }
 

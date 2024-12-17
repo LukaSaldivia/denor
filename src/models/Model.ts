@@ -61,14 +61,33 @@ class Model<C extends string, PK extends C[]> {
         return this.search_object
     }
 
-    async executeSearch(min = 0) {
+    async executeSearch(
+        min = 0, 
+        options : {
+            sortBy? : { field : C, order : "ASC" | "DESC"}[],
+            limit : number,
+            offset : number
+
+    } = { limit : 15, offset : 0}) {
         let cases = this.search_object.filters.map((filter: Filter<C>) => filter.get())
         if (cases.length == 0) {
             cases.push(String(min))
         }
         let casesQuery = cases.join('+')
 
-        let query = `SELECT * FROM ( SELECT *, (${casesQuery}) AS relevance FROM ${this.table_name}) subquery WHERE relevance >= ${min} ORDER BY relevance DESC`
+        // SortHandle
+
+        let { sortBy } = options || { sortBy : [] }
+
+        let sortQuery = []
+
+        for (const sortObj of sortBy) {
+            sortQuery.push(`${sortObj.field} ${sortObj.order || "ASC"}`)
+        }
+
+        // 
+
+        let query = `SELECT * FROM ( SELECT *, (${casesQuery}) AS relevance FROM ${this.table_name}) subquery WHERE relevance >= ${min} ORDER BY relevance DESC ${ sortQuery.length > 0 ? ', ' + sortQuery.join(',') : ''} LIMIT ${options.limit} OFFSET ${options.offset};`
 
         return await this._executeQuery(query)
     }
