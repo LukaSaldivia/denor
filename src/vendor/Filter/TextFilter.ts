@@ -6,7 +6,7 @@ export default class TextFilter<C extends string> extends Filter<C>{
   constructor(txt = "", field : C, score? : number){
     super(field, score)
     this.txt = txt
-    this.score /= this.txt.length
+    this.score = +(this.score / this.txt.length).toFixed(2)
   }
 
   get(){

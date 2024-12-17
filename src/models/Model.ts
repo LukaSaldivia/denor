@@ -77,7 +77,7 @@ class Model<C extends string, PK extends C[]> {
 
         // SortHandle
 
-        let { sortBy } = options || { sortBy : [] }
+        let sortBy  = options.sortBy || []
 
         let sortQuery = []
 
@@ -87,7 +87,9 @@ class Model<C extends string, PK extends C[]> {
 
         // 
 
-        let query = `SELECT * FROM ( SELECT *, (${casesQuery}) AS relevance FROM ${this.table_name}) subquery WHERE relevance >= ${min} ORDER BY relevance DESC ${ sortQuery.length > 0 ? ', ' + sortQuery.join(',') : ''} LIMIT ${options.limit} OFFSET ${options.offset};`
+        let query = `SELECT * FROM ( SELECT *, (${casesQuery}) AS relevance FROM ${this.table_name}) subquery WHERE relevance >= ${min} ORDER BY relevance DESC ${ sortQuery.length > 0 ? ', ' + sortQuery.join(',') : ''} LIMIT ${options.limit || 15} OFFSET ${options.offset || 0};`
+
+        console.log(query)
 
         return await this._executeQuery(query)
     }

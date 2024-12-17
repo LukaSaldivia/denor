@@ -18,7 +18,7 @@ export default class RangeFilter<C extends string> extends Filter<C>{
   }
 
   _buildCaseQuery(min : string | number, max : string | number){
-    return `CASE WHEN ${String(this.field)} BETWEEN %${min}% AND ${max} THEN ${this.score} ELSE 0 END`
+    return `CASE WHEN ${String(this.field)} BETWEEN "${min}" AND "${max}" THEN ${this.score} ELSE 0 END`
   }
 }
 

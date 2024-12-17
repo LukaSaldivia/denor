@@ -7,17 +7,27 @@ router.get('/', async(req, res) => {
 
   model.newSearch()
 .appendFilter({
-  type : "text",
-  field : 'nombre',
-  value : 'Melany'
+  type : "range",
+  field : 'creado_el',
+  min : '2024-1-1',
+  max : '2024-11-11'
 })
 .appendFilter({
-  type : 'date',
-  field : 'creado_el',
-  value : '2024-12-12'
+  type : 'text',
+  field : 'nombre',
+  value : 'Melany',
+  score : 3
 })
 
-let [results] = await model.executeSearch(1)
+
+let [results] = await model.executeSearch(1, {
+  sortBy : [
+    {
+      field : 'nombre',
+      order : 'DESC'
+    }
+  ]
+})
 res.send(results)
 
 })
