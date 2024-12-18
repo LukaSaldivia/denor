@@ -9,14 +9,12 @@ import JoinGroup from "../vendor/JoinGroup.js";
 
 class Model<C extends string, PK extends C[]> {
 
-    table : Table<C,PK>
     table_name = ''
     db: typeof db
     private filterGroup: FilterGroup<C> = new FilterGroup<C>()
     joins: JoinGroup<C>
 
     constructor(table: Table<C, PK>) {
-        this.table = table
         this.table_name = table.table_name
         this.db = db
         this.joins = new JoinGroup()
