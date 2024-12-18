@@ -1,5 +1,5 @@
 import MODELS from "./models.js"
 
-let { USUARIO : model } = MODELS
+let { CLIENTE : model} = MODELS
 
 export default model

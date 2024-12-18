@@ -4,17 +4,22 @@ import { Table } from "../types/MVC-related-types.js";
 import catchError from "../utils/catchError.js";
 import { ConnectionError } from "../errors/EError.js";
 import FilterGroup from "../vendor/FilterGroup.js";
+import JoinGroup from "../vendor/JoinGroup.js";
 
 
 class Model<C extends string, PK extends C[]> {
 
+    table : Table<C,PK>
     table_name = ''
     db: typeof db
-    private search_object: FilterGroup<C> = new FilterGroup<C>()
+    private filterGroup: FilterGroup<C> = new FilterGroup<C>()
+    joins: JoinGroup<C>
 
     constructor(table: Table<C, PK>) {
+        this.table = table
         this.table_name = table.table_name
         this.db = db
+        this.joins = new JoinGroup()
     }
 
 
@@ -57,19 +62,19 @@ class Model<C extends string, PK extends C[]> {
     }
 
     newSearch(): FilterGroup<C> {
-        this.search_object = new FilterGroup<C>()
-        return this.search_object
+        this.filterGroup = new FilterGroup<C>()
+        return this.filterGroup
     }
 
     async executeSearch(
-        min = 0, 
-        options : {
-            sortBy? : { field : C, order : "ASC" | "DESC"}[],
-            limit : number,
-            offset : number
+        min = 0,
+        options: {
+            sortBy?: { field: C, order: "ASC" | "DESC" }[],
+            limit: number,
+            offset: number
 
-    } = { limit : 15, offset : 0}) {
-        let cases = this.search_object.filters.map((filter: Filter<C>) => filter.get())
+        } = { limit: 15, offset: 0 }) {
+        let cases = this.filterGroup.filters.map((filter: Filter<C>) => filter.get())
         if (cases.length == 0) {
             cases.push(String(min))
         }
@@ -77,7 +82,7 @@ class Model<C extends string, PK extends C[]> {
 
         // SortHandle
 
-        let sortBy  = options.sortBy || []
+        let sortBy = options.sortBy || []
 
         let sortQuery = []
 
@@ -87,11 +92,15 @@ class Model<C extends string, PK extends C[]> {
 
         // 
 
-        let query = `SELECT * FROM ( SELECT *, (${casesQuery}) AS relevance FROM ${this.table_name}) subquery WHERE relevance >= ${min} ORDER BY relevance DESC ${ sortQuery.length > 0 ? ', ' + sortQuery.join(',') : ''} LIMIT ${options.limit || 15} OFFSET ${options.offset || 0};`
+        let query = `SELECT * FROM ( SELECT *, (${casesQuery}) AS relevance FROM ${this.table_name}) subquery WHERE relevance >= ${min} ORDER BY relevance DESC ${sortQuery.length > 0 ? ', ' + sortQuery.join(',') : ''} LIMIT ${options.limit || 15} OFFSET ${options.offset || 0};`
 
         console.log(query)
 
         return await this._executeQuery(query)
+    }
+
+    insertJoins(){
+        return this.joins
     }
 
     async get(pk: Record<PK[number], string>) {
