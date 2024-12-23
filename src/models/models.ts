@@ -12,13 +12,13 @@ const MODELS = {
 
 // JOINS
 MODELS.CLIENTE.insertJoins()
-.join(["vendedor"], TABLES.USUARIO, ["id"])
+.join(TABLES.USUARIO, [["vendedor", "id"]])
 
 MODELS.PEDIDO.insertJoins()
-.join(["cliente"], TABLES.CLIENTE, ["id"])
+.join(TABLES.CLIENTE, [["cliente", "id"]])
 
 MODELS.RENGLON_PEDIDO.insertJoins()
-.join(["id_pedido"], TABLES.PEDIDO, ["id"])
-.join(["id_producto"], TABLES.PRODUCTO, ["id"])
+.join(TABLES.PEDIDO, [["id_pedido", "id"]])
+.join(TABLES.PRODUCTO, [["id_producto", "id"]])
 
 export default MODELS

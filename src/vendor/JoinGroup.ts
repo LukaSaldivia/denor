@@ -1,4 +1,4 @@
-import { Table, Join } from "../types/MVC-related-types.js";
+import { Table, Join, Pair } from "../types/MVC-related-types.js";
 import JoinFactory from "../utils/JoinFactory.js";
 
 
@@ -6,10 +6,16 @@ export default class JoinGroup<AC extends string> {
 
   joins: Join<AC, any, any>[] = []
 
-  join<Akey extends AC, BC extends string, PK extends BC[], Bkey extends BC[]>(
-    foreignKey: Akey[], table: Table<BC, PK>, localKey: Bkey) {
-    this.joins.push(JoinFactory.createJoin(foreignKey, table, localKey))
+
+  join<BC extends string, BPK extends BC[]>
+    (
+      table: Table<BC, BPK>,
+      cols: Pair<AC, BC>[]
+    ) {
+    this.joins.push(JoinFactory.createJoin(table, cols))
+
     return this
+
   }
 
 }
