@@ -67,7 +67,7 @@ class Model<C extends string, PK extends C[]> {
     async search(
         min = 0,
         options: {
-            sortBy?: { field: C, order: "ASC" | "DESC" }[],
+            sortBy?: { field: C | "relevance", order: "ASC" | "DESC" }[],
             limit?: number,
             offset?: number
 
