@@ -3,11 +3,16 @@ import TABLES from "./tables.js";
 import Model from "./Model.js";
 
 const MODELS = {
-  USUARIO : new Model(TABLES.USUARIO),
-  CLIENTE : new Model(TABLES.CLIENTE) ,
+  CLIENTE : new Model(TABLES.CLIENTE),
+  GRUPO_PRODUCTO : new Model(TABLES.GRUPO_PRODUCTO),
+  PEDIDO : new Model(TABLES.PEDIDO),
+  PERMISO : new Model(TABLES.PERMISO),
   PRODUCTO : new Model(TABLES.PRODUCTO),
   RENGLON_PEDIDO : new Model(TABLES.RENGLON_PEDIDO),
-  PEDIDO : new Model(TABLES.PEDIDO),
+  ROL : new Model(TABLES.ROL),
+  ROL_X_PERMISO : new Model(TABLES.ROL_X_PERMISO),
+  SECCION_PRODUCTO : new Model(TABLES.SECCION_PRODUCTO),
+  USUARIO : new Model(TABLES.USUARIO),
 }
 
 // JOINS

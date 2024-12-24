@@ -59,17 +59,17 @@ class Model<C extends string, PK extends C[]> {
 
     }
 
-    newSearch(): FilterGroup<C> {
+    prepareSearch(): FilterGroup<C> {
         this.filterGroup = new FilterGroup<C>()
         return this.filterGroup
     }
 
-    async executeSearch(
+    async search(
         min = 0,
         options: {
             sortBy?: { field: C, order: "ASC" | "DESC" }[],
-            limit: number,
-            offset: number
+            limit?: number,
+            offset?: number
 
         } = { limit: 15, offset: 0 }) {
         let cases = this.filterGroup.filters.map((filter: Filter<C>) => filter.get())
