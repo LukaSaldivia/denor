@@ -4,7 +4,7 @@ import { Table } from "../types/MVC-related-types.js";
 import catchError from "../utils/catchError.js";
 import { ConnectionError } from "../errors/EError.js";
 import FilterGroup from "../vendor/FilterGroup.js";
-import JoinGroup from "../vendor/JoinGroup.js";
+import ForeignKeyReferencesGroup from "../vendor/ForeignKeyReferencesGroup.js";
 
 
 class Model<C extends string, PK extends C[]> {
@@ -12,12 +12,12 @@ class Model<C extends string, PK extends C[]> {
     table_name = ''
     db: typeof db
     private filterGroup: FilterGroup<C> = new FilterGroup<C>()
-    joins: JoinGroup<C>
+    joins: ForeignKeyReferencesGroup<C>
 
     constructor(table: Table<C, PK>) {
         this.table_name = table.table_name
         this.db = db
-        this.joins = new JoinGroup()
+        this.joins = new ForeignKeyReferencesGroup()
     }
 
 
@@ -92,7 +92,12 @@ class Model<C extends string, PK extends C[]> {
 
         let query = `SELECT * FROM ( SELECT *, (${casesQuery}) AS relevance FROM ${this.table_name}) subquery WHERE relevance >= ${min} ORDER BY relevance DESC ${sortQuery.length > 0 ? ', ' + sortQuery.join(',') : ''} LIMIT ${options.limit || 15} OFFSET ${options.offset || 0};`
 
-        console.log(query)
+
+        console.log('----');
+        console.log(query);
+        console.log('----');
+        
+
 
         return await this._executeQuery(query)
     }

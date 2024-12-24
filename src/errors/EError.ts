@@ -28,5 +28,13 @@ class DeniedAccessDatabaseError extends _Error {
   }
 }
 
+class DuplicateEntryError extends _Error {
+  // ER_DUP_ENTRY
+  constructor(message: string) {
+    super(message)
+    this.name = 'Duplicate Entry Error'
+  }
+}
 
-export { _Error, ConnectionError, UnknownDatabaseError, DeniedAccessDatabaseError }
+
+export { _Error, ConnectionError, UnknownDatabaseError, DeniedAccessDatabaseError, DuplicateEntryError }

@@ -1,7 +1,7 @@
-import { Table, Join, Pair } from "../types/MVC-related-types.js";
+import { Table, ForeignKey, Pair } from "../types/MVC-related-types.js";
 
-export default class JoinFactory {
-  static createJoin
+export default class ForeignKeyFactory {
+  static createForeignKeyReference
   <
   AC extends string, 
   BC extends string, 
@@ -10,7 +10,7 @@ export default class JoinFactory {
   (
     B: Table<BC, BPK>,
     columns : Pair<AC, BC>[]
-  ) : Join<AC, BC, BPK>
+  ) : ForeignKey<AC, BC, BPK>
   
   {
     return {

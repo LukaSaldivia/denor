@@ -22,13 +22,13 @@ type FilterOptions<C extends string> = {
 
   )
 
-type Join<AC extends string, BC extends string, PK extends BC[]> = {
+type ForeignKey<AC extends string, BC extends string, PK extends BC[]> = {
   table : Table<BC,PK>,
   columns : Pair<AC, BC>[]
 }
 
 type Pair<AC extends string, BC extends string> = [AC, BC]
 
-export { Table, FilterOptions, Join, Pair }
+export { Table, FilterOptions, ForeignKey, Pair }
 
 

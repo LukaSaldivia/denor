@@ -1,28 +1,40 @@
 import { Router } from 'express'
-import model from '../models/usuario.model.js'
+import MODELS from '../models/models.js'
 
 const router = Router()
 
 router.get('/', async(req, res) => {
 
-  model.prepareSearch()
-.appendFilter({
-  field : "nombre",
-  type : "text",
-  value : "",
-  score : 9
+//   MODELS.CLIENTE.prepareSearch()
+// .appendFilter({
+//   field : "vendedor",
+//   type : "text",
+//   value : "",
+//   score : 9
   
+// })
+
+
+// let [results] = await MODELS.CLIENTE.search(0, {
+//   sortBy : [
+//     {
+//       field : 'relevance',
+//       order : 'DESC'
+//     }
+//   ]
+// })
+// res.send(results)
+
+MODELS.ROL.prepareSearch()
+.appendFilter({
+  field : 'nombre',
+  type : 'text',
+  value : 'admIni'
 })
 
 
-let [results] = await model.search(0, {
-  sortBy : [
-    {
-      field : 'nombre',
-      order : 'DESC'
-    }
-  ]
-})
+let [results] = await MODELS.ROL.search()
+
 res.send(results)
 
 
