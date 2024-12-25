@@ -2,7 +2,7 @@ import db from "../database/db.js";
 import Filter from "../vendor/Filter/Filter.js";
 import { Table, ForeignKey } from "../types/MVC-related-types.js";
 import catchError from "../utils/catchError.js";
-import { ConnectionError } from "../errors/EError.js";
+import { ConnectionError, UnknownDatabaseError, DeniedAccessDatabaseError, DuplicateEntryError } from "../errors/EError.js";
 import FilterGroup from "../vendor/FilterGroup.js";
 import ForeignKeyReferencesGroup from "../vendor/ForeignKeyReferencesGroup.js";
 
@@ -135,16 +135,8 @@ class Model<C extends string, PK extends C[]> {
 
         console.log('----');
         console.log(query);
-        console.log('----');
-
-//  SELECT subquery.*, grupo_producto.nombre AS grupo_producto__nombre FROM 
-//  ( SELECT *, (0) AS relevance FROM producto) subquery 
-//  LEFT JOIN grupo_producto ON subquery.grupo = grupo_producto.nombre 
-//  LEFT JOIN seccion_producto ON subquery.seccion = seccion_producto.nombre 
-//  WHERE relevance >= 0 ORDER BY relevance DESC  LIMIT 15 OFFSET 0;
+        console.log('----');        
         
-
-
         return await this._executeQuery(query)
     }
 
@@ -163,14 +155,28 @@ class Model<C extends string, PK extends C[]> {
 
 
     async _executeQuery(query: string, values?: string[]) {
-        let [err, res] = await catchError(this.db.query(query, values), [ConnectionError])
+        let [err, res] = await catchError(this.db.query(query, values))
 
         if (err) {
 
+            if (err.code == "ER_BAD_DB_ERROR") {
+                throw new UnknownDatabaseError("")
+            }
+            if (err.code == "ECONNREFUSED") {
+                throw new ConnectionError("")
+            }
+            if (err.code == "ER_ACCESS_DENIED_ERROR") {
+                throw new DeniedAccessDatabaseError("")
+            }
+            if (err.code == "ER_DUP_ENTRY") {
+                throw new DuplicateEntryError("")
+            }
+
+            return []
         }
 
         db.releaseConnection(await db.getConnection())
-        return res
+        return res[0]
 
     }
 }

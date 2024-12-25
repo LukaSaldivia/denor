@@ -1,22 +1,13 @@
 import { _Error } from "../errors/EError.js";
 
-export default async function catchError<T, _Error>(
-  promise : Promise<T>, 
-  errorsToCatch? : _Error[]
+export default async function catchError<T>(
+  promise : Promise<T>
   ){
     return promise
     .then(data => {
       return [undefined, data] as [undefined, T]
     })
     .catch(error => {
-      if (errorsToCatch == undefined) {
-        return [error]
-      }
-
-      if (errorsToCatch.some(e => error instanceof _Error)) {
-        return [error]
-      }
-
-      throw error
+      return [error]
     })
 }

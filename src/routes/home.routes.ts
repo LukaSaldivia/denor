@@ -44,7 +44,7 @@ MODELS.PRODUCTO.prepareSearch()
   value : "Aliger"
 })
 
-let [results] = await MODELS.PRODUCTO.search()
+let results = await MODELS.ROL.search()
 
 res.send(results)
 
