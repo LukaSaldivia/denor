@@ -172,7 +172,7 @@ class Model<C extends string, PK extends C[]> {
                 throw new DuplicateEntryError("")
             }
 
-            return []
+            throw new Error("")
         }
 
         db.releaseConnection(await db.getConnection())
