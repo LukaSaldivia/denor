@@ -160,19 +160,19 @@ class Model<C extends string, PK extends C[]> {
         if (err) {
 
             if (err.code == "ER_BAD_DB_ERROR") {
-                throw new UnknownDatabaseError("")
+                throw new UnknownDatabaseError()
             }
             if (err.code == "ECONNREFUSED") {
-                throw new ConnectionError("")
+                throw new ConnectionError()
             }
             if (err.code == "ER_ACCESS_DENIED_ERROR") {
-                throw new DeniedAccessDatabaseError("")
+                throw new DeniedAccessDatabaseError()
             }
             if (err.code == "ER_DUP_ENTRY") {
-                throw new DuplicateEntryError("")
+                throw new DuplicateEntryError()
             }
 
-            throw new Error("")
+            throw new Error()
         }
 
         db.releaseConnection(await db.getConnection())
