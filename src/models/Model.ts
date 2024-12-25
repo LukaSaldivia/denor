@@ -1,6 +1,6 @@
 import db from "../database/db.js";
 import Filter from "../vendor/Filter/Filter.js";
-import { Table } from "../types/MVC-related-types.js";
+import { Table, ForeignKey } from "../types/MVC-related-types.js";
 import catchError from "../utils/catchError.js";
 import { ConnectionError } from "../errors/EError.js";
 import FilterGroup from "../vendor/FilterGroup.js";
@@ -12,12 +12,12 @@ class Model<C extends string, PK extends C[]> {
     table_name = ''
     db: typeof db
     private filterGroup: FilterGroup<C> = new FilterGroup<C>()
-    joins: ForeignKeyReferencesGroup<C>
+    foreignKeys: ForeignKeyReferencesGroup<C>
 
     constructor(table: Table<C, PK>) {
         this.table_name = table.table_name
         this.db = db
-        this.joins = new ForeignKeyReferencesGroup()
+        this.foreignKeys = new ForeignKeyReferencesGroup()
     }
 
 
@@ -88,14 +88,60 @@ class Model<C extends string, PK extends C[]> {
             sortQuery.push(`${sortObj.field} ${sortObj.order || "ASC"}`)
         }
 
+
+        // Foreign keys handle
+        // Renaming from selects to avoid collisions
+        
+        let joins = []
+        
+        let selects = []
+
+        this.foreignKeys.references.forEach((fk : ForeignKey<C, any, any>) => {
+            
+            let q = `LEFT JOIN ${fk.table.table_name} ON `
+            let relations = []
+
+            let renamed_columns = []
+
+            for (const pair of fk.columns) {
+                relations.push(`subquery.${pair[0]} = ${fk.table.table_name}.${pair[1]}`)
+
+                renamed_columns.push(`${fk.table.table_name}.${pair[1]} AS ${fk.table.table_name}__${pair[1]}`)
+            }
+
+            q += relations.join(' AND ')
+
+            joins.push(q)
+
+
+
+
+            selects.push(...renamed_columns)
+
+        } )
+
+
+
+
+        
+        
+        
+
+
         // 
 
-        let query = `SELECT * FROM ( SELECT *, (${casesQuery}) AS relevance FROM ${this.table_name}) subquery WHERE relevance >= ${min} ORDER BY relevance DESC ${sortQuery.length > 0 ? ', ' + sortQuery.join(',') : ''} LIMIT ${options.limit || 15} OFFSET ${options.offset || 0};`
+        let query = `SELECT subquery.* ${selects.length > 0 ? ', ' + selects.join(',') : ''} FROM ( SELECT *, (${casesQuery}) AS relevance FROM ${this.table_name}) subquery ${joins.join(" ")} WHERE relevance >= ${min} ORDER BY relevance DESC ${sortQuery.length > 0 ? ', ' + sortQuery.join(',') : ''} LIMIT ${options.limit || 15} OFFSET ${options.offset || 0};`
 
 
         console.log('----');
         console.log(query);
         console.log('----');
+
+//  SELECT subquery.*, grupo_producto.nombre AS grupo_producto__nombre FROM 
+//  ( SELECT *, (0) AS relevance FROM producto) subquery 
+//  LEFT JOIN grupo_producto ON subquery.grupo = grupo_producto.nombre 
+//  LEFT JOIN seccion_producto ON subquery.seccion = seccion_producto.nombre 
+//  WHERE relevance >= 0 ORDER BY relevance DESC  LIMIT 15 OFFSET 0;
         
 
 
@@ -103,7 +149,7 @@ class Model<C extends string, PK extends C[]> {
     }
 
     insertJoins(){
-        return this.joins
+        return this.foreignKeys
     }
 
     async get(pk: Record<PK[number], string>) {

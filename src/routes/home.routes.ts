@@ -25,15 +25,26 @@ router.get('/', async(req, res) => {
 // })
 // res.send(results)
 
-MODELS.ROL.prepareSearch()
+// MODELS.ROL.prepareSearch()
+// .appendFilter({
+//   field : 'nombre',
+//   type : 'text',
+//   value : 'admIni'
+// })
+
+
+// let [results] = await MODELS.ROL.search()
+
+// res.send(results)
+
+MODELS.PRODUCTO.prepareSearch()
 .appendFilter({
-  field : 'nombre',
-  type : 'text',
-  value : 'admIni'
+  field : "grupo",
+  type : "text",
+  value : "Aliger"
 })
 
-
-let [results] = await MODELS.ROL.search()
+let [results] = await MODELS.PRODUCTO.search()
 
 res.send(results)
 
